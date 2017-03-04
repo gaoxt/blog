@@ -34,7 +34,7 @@ docker run --name php7-prf -v /php-oop:/tmp php7-prf
 docker exec php7-prf php -d xdebug.profiler_enable=On /tmp/1old.php
 ```
 
-4.通过webgrind分析profiler文件。
+4.通过webgrind分析profiler文件。
 ```c 
 docker run --rm -v /php-oop/profiler:/tmp -p 80:80 jokkedk/webgrind:latest
 ```
