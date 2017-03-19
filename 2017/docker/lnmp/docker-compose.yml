@@ -2,8 +2,8 @@ version: '3'
 
 services:
   php56:
-    container_name: php56
-    build: ./php56
+    container_name: lamp_php56
+    image: docker_env_php56
     ports:
       - "9000:9000"
     volumes:
@@ -18,7 +18,7 @@ services:
       - mysql
 
   nginx:
-    container_name: nginx
+    container_name: lamp_nginx
     image: nginx:1.12.1-alpine
     ports:
       - "80:80"
@@ -33,7 +33,7 @@ services:
       - php56
 
   mysql:
-    container_name: mysql
+    container_name: lamp_mysql
     image: mysql:5.6
     ports:
       - "3306:3306"
