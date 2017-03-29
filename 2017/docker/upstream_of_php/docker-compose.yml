@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  php56_1:
+    container_name: php56_1
+    image: php:5.6.31-fpm-alpine
+    volumes:
+      - ./php56/www.conf:/usr/local/etc/php.d/www.conf
+      - ./php56/php.ini:/usr/local/etc/php/php.ini
+      - ./index.php:/usr/share/nginx/html/index.php
+
+  php56_2:
+    container_name: php56_2
+    image: php:5.6.31-fpm-alpine
+    volumes:
+      - ./php56/www.conf:/usr/local/etc/php.d/www.conf
+      - ./php56/php.ini:/usr/local/etc/php/php.ini
+      - ./index.php:/usr/share/nginx/html/index.php
+
+  nginx:
+    container_name: nginx
+    image: nginx:1.12.1-alpine
+    ports:
+      - "7001:7001"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+      - ./index.php:/usr/share/nginx/html/index.php
+    depends_on:
+      - php56_1
+      - php56_2
