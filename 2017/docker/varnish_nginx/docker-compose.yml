@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  nginx1:
+    container_name: nginx1
+    image: nginx:1.12.1-alpine
+    volumes:
+      - ./nginx/index1.html:/usr/share/nginx/html/index.html
+
+  nginx2:
+    container_name: nginx2
+    image: nginx:1.12.1-alpine
+    volumes:
+      - ./nginx/index2.html:/usr/share/nginx/html/index.html
+
+  varnish:
+    container_name: varnish
+    image: varnish
+    ports:
+      - "8080:80"
+    volumes:
+      - ./varnish/default.vcl:/etc/varnish/default.vcl
+    depends_on:
+      - nginx1
+      - nginx2
