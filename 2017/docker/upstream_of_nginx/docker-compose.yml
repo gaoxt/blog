@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  nginx_master:
+    container_name: nginx_master
+    image: nginx:1.12.1-alpine
+    ports:
+      - "7001:7001"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d/master.conf:/etc/nginx/conf.d/master.conf
+
+  nginx_1:
+    container_name: nginx_1
+    image: nginx:1.12.1-alpine
+    ports:
+      - "7002:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d/slave.conf:/etc/nginx/conf.d/slave.conf
+      - ./html/index_1.html/:/usr/share/nginx/html/index.html
+
+  nginx_2:
+    container_name: nginx_2
+    image: nginx:1.12.1-alpine
+    ports:
+      - "7003:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d/slave.conf:/etc/nginx/conf.d/slave.conf
+      - ./html/index_2.html/:/usr/share/nginx/html/index.html
