@@ -3,7 +3,7 @@ version: '3'
 services:
   php56:
     container_name: lnp_php56
-    image: lnmp_php56
+    build: ./php56
     ports:
       - "9000:9000"
     volumes:
