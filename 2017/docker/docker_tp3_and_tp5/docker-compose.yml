@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  php56:
+    container_name: lnp_php56
+    image: lnmp_php56
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./php56/:/usr/local/etc/php.d/
+      - ./php56/php.ini:/usr/local/etc/php/php.ini
+      - ./php56/logs:/var/log/
+      - ./php56/logs/profiler:/var/log/profiler/
+      - /Users/gaox/work/about_php/tp3.2:/usr/share/nginx/tp3
+      - /Users/gaox/work/about_php/tp5.0:/usr/share/nginx/tp5
+
+  nginx:
+    container_name: lnp_nginx
+    image: nginx:1.12.1-alpine
+    ports:
+      - "8003:8003"
+      - "8005:8005"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d/:/etc/nginx/conf.d
+      - ./nginx/logs:/var/log/nginx/
+      - /Users/gaox/work/about_php/tp3.2:/usr/share/nginx/tp3
+      - /Users/gaox/work/about_php/tp5.0:/usr/share/nginx/tp5
