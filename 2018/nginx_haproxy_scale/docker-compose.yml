@@ -1,0 +1,12 @@
+version: '3'
+services:
+  web:
+    image: nginx:1.13.5-alpine
+  proxy: 
+    image: haproxy:1.7-alpine
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    links: 
+      - web 
+    ports:
+      - 6301:6301
