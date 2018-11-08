@@ -13,6 +13,7 @@ process_data = [url_list[i:i + cut_count]
 
 
 def get_page_data(url):
+    # return url
     response = requests.get(url, headers={
                             'User-Agent': "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/4.0)"})
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -43,5 +44,22 @@ def test_process():
         print(q.get())
 
 
+def test_pool_process():
+    # 子进程共享里的Queue不能直接创建，需要从Manager获得
+    manager = Manager()
+    q = manager.Queue()
+
+    p = Pool(process_count)
+    for i in range(0, process_count):
+        p.apply_async(get_multi_page_data, args=(q, process_data[i]))
+    p.close()
+    p.join()
+
+    print('total: %d' % q.qsize())
+    while not q.empty():
+        print(q.get())
+
+
 if __name__ == '__main__':
-    test_process()
+    # test_process()
+    test_pool_process()
