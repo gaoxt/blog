@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from multiprocessing import Process, Queue, Pool, Manager
+from threading import Thread
 
 max_page = 10
 cut_count = 5
@@ -13,7 +14,7 @@ process_data = [url_list[i:i + cut_count]
 
 
 def get_page_data(url):
-    # return url
+    return url
     response = requests.get(url, headers={
                             'User-Agent': "Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.2; Trident/4.0)"})
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -39,7 +40,7 @@ def test_process():
     for i in process_list:
         i.join()
 
-    print('total: %d' % q.qsize())
+    print('total:%d process_num:%d' % (q.qsize(), process_count))
     while not q.empty():
         print(q.get())
 
@@ -54,12 +55,37 @@ def test_pool_process():
         p.apply_async(get_multi_page_data, args=(q, process_data[i]))
     p.close()
     p.join()
-
-    print('total: %d' % q.qsize())
+    print('total:%d process_num:%d' % (q.qsize(), process_count))
     while not q.empty():
         print(q.get())
 
 
+def test_thread():
+    q = Queue()
+
+    thread_list = []
+
+    for i in range(0, process_count):
+        t = Thread(target=get_multi_page_data, args=(q, process_data[i]))
+        t.start()
+        thread_list.append(t)
+
+    for i in thread_list:
+        i.join()
+
+    data = {}
+    while not q.empty():
+        data = {**data, **q.get()}
+    print('total:%d  process_num:%d' % (len(data), process_count))
+    print(data)
+
+
 if __name__ == '__main__':
+    # 多进程
     # test_process()
-    test_pool_process()
+
+    # 多进程池
+    # test_pool_process()
+
+    # 多线程
+    test_thread()
