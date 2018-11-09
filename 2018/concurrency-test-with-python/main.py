@@ -1,3 +1,6 @@
+# 使用 gevent 可以遇到阻塞自动切换协程
+# from gevent import monkey;monkey.patch_all()
+
 import requests
 from bs4 import BeautifulSoup
 from multiprocessing import Process, Pool, Manager
