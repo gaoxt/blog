@@ -5,8 +5,10 @@ from threading import Thread
 import gevent
 from user_agent import generate_user_agent
 # from multiprocessing import Queue
-# gevent方式使用的Queue ，测试请注释上面的 Queue
+# gevent 和 异步 的方式使用的Queue ，测试请注释上面的 Queue
 from gevent.queue import Queue
+import asyncio
+import aiohttp
 
 headers = {
     'User-Agent': generate_user_agent(),
@@ -150,8 +152,70 @@ def test_gevent_get_page(q, url):
     return q.put(url)
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.text, 'html.parser')
-    q.put(soup.select("#content_left .result.c-container h3")
+    q.put(soup.select("#content_left .c-container h3")
           [0].get_text().strip())
+
+
+def test_asyncio():
+    q = Queue()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(asyncio.wait(
+        [asyncio_get_page_data(q, url) for url in url_list]))
+    loop.close()
+    print('total: %d' % q.qsize())
+    while not q.empty():
+        print(q.get())
+
+
+async def asyncio_get_page_data(q, url):
+    q.put(url)
+    # async with aiohttp.ClientSession(headers=headers) as session:
+    #     async with session.get(url) as response:
+    #         html = await response.text()
+    #         soup = BeautifulSoup(html, 'html.parser')
+    #         q.put(soup.select("#content_left .c-container h3")
+    #               [0].get_text().strip())
+
+
+def test_process_asyncio():
+    manager = Manager()
+    q = manager.Queue()
+    p = Pool(process_count)
+    for i in range(0, process_count):
+        p.apply_async(test_process_asyncio_loop, args=(q, process_data[i]))
+    p.close()
+    p.join()
+
+    print('total: %d' % q.qsize())
+    while not q.empty():
+        print(q.get())
+
+
+def test_process_asyncio_loop(q, data, loop=None):
+    if not loop:
+        loop = asyncio.get_event_loop()
+    loop.run_until_complete(asyncio.wait(
+        [asyncio_get_page_data(q, url) for url in data]))
+    loop.close()
+
+
+def test_thread_asyncio():
+    q = Queue()
+    thread_list = []
+    for i in range(0, process_count):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        t = Thread(target=test_process_asyncio_loop,
+                   args=(q, process_data[i], loop))
+        t.start()
+        thread_list.append(t)
+
+    for i in thread_list:
+        i.join()
+
+    print('total: %d' % q.qsize())
+    while not q.empty():
+        print(q.get())
 
 
 if __name__ == '__main__':
@@ -172,3 +236,12 @@ if __name__ == '__main__':
 
     # 多进程+协程
     # test_coroutine_process()
+
+    # 异步io
+    # test_asyncio()
+
+    # 多进程+异步io
+    # test_process_asyncio()
+
+    # 多线程+异步io
+    # test_thread_asyncio()
