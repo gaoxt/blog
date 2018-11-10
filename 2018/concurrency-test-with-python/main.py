@@ -9,6 +9,16 @@ from user_agent import generate_user_agent
 from gevent.queue import Queue
 import asyncio
 import aiohttp
+import os
+import time
+import random
+import cProfile
+
+proxies = {
+    'http': 'http://119.101.117.148:9999',
+    'https': 'https://121.63.199.133:9999'
+}
+proxy = 'http://119.101.114.239:9999'
 
 headers = {
     'User-Agent': generate_user_agent(),
@@ -16,7 +26,9 @@ headers = {
 
 max_page = 10
 cut_count = 5
-process_count = int(max_page / cut_count)
+process_count = 1 if int(
+    max_page / cut_count) == 0 else int(
+    max_page / cut_count)
 url = "https://www.baidu.com/s?wd="
 url_list = [url + str(i + 1) for i in range(0, max_page)]
 
@@ -170,7 +182,7 @@ def test_asyncio():
 async def asyncio_get_page_data(q, url):
     q.put(url)
     # async with aiohttp.ClientSession(headers=headers) as session:
-    #     async with session.get(url) as response:
+    #     async with session.get(url, proxy=proxy) as response:
     #         html = await response.text()
     #         soup = BeautifulSoup(html, 'html.parser')
     #         q.put(soup.select("#content_left .c-container h3")
@@ -219,8 +231,10 @@ def test_thread_asyncio():
 
 
 if __name__ == '__main__':
+    p = cProfile.Profile()
+
     # 多进程
-    # test_process()
+    test_process()
 
     # 多进程池
     # test_pool_process()
@@ -245,3 +259,6 @@ if __name__ == '__main__':
 
     # 多线程+异步io
     # test_thread_asyncio()
+
+    p.disable()
+    p.print_stats(sort='tottime')
