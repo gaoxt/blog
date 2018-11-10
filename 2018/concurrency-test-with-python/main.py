@@ -4,9 +4,9 @@ from multiprocessing import Process, Pool, Manager
 from threading import Thread
 import gevent
 from user_agent import generate_user_agent
-# from multiprocessing import Queue
+from multiprocessing import Queue
 # gevent 和 异步 的方式使用的Queue ，测试请注释上面的 Queue
-from gevent.queue import Queue
+# from gevent.queue import Queue
 import asyncio
 import aiohttp
 import os
