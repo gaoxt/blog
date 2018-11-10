@@ -23,9 +23,13 @@ proxy = 'http://119.101.114.239:9999'
 headers = {
     'User-Agent': generate_user_agent(),
 }
-
+# 请求数量
 max_page = 10
+
+# 分片处理的最大数量
 cut_count = 5
+
+# 进程数量，请求数低于分片数则是单进程
 process_count = 1 if int(
     max_page / cut_count) == 0 else int(
     max_page / cut_count)
