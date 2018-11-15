@@ -26,6 +26,116 @@ headers = {
     'User-Agent': ua
 }
 
+
+conn = MongoClient('127.0.0.1', 27017)
+collection = conn.gz_data.all_content
+
+
+def filter_data(_type, data):
+    if _type == 'zxjy':
+        del data[1]
+        del data[3]
+
+    elif _type == 'wtts':
+        del data[3]
+
+    elif _type == 'jzxx':
+        return data
+    return data
+
+
+def filter_content(_type, data):
+    if _type == 'zxjy':
+        del data[3]
+
+    elif _type == 'wtts':
+        return data
+
+    elif _type == 'jzxx':
+        return data
+
+    return data
+
+
+def md5(arg, code='utf-8'):
+    md5_pwd = hashlib.md5(bytes('gz', encoding=code))
+    md5_pwd.update(bytes(arg, encoding=code))
+    return md5_pwd.hexdigest()
+
+
+def format_data(data):
+    course = {
+        'content_md5': data.get('content_md5'),
+        'title': data.get('title'),
+        'type': data.get('type'),
+        'question_type': data.get('question_type'),
+        'people': data.get('people'),
+        'content': data.get('content'),
+        'reply': data.get('reply'),
+        'reply_time': parse(data.get('reply_time')),
+        'create_time': parse(data.get('create_time'))
+    }
+    return course
+
+
+def get_page_data(url):
+    # response = requests.get(url, headers=headers, proxies=proxies)
+    response = requests.get(url, headers=headers)
+    response.encoding = 'utf-8'
+    soup = BeautifulSoup(response.text, 'html.parser')
+    return soup
+
+
+def format_page_info(key, el):
+    data = {}
+    txt = html.unescape(str(el))
+    arr = re.finditer(pattern, txt)
+    href = texts = ''
+    for match in arr:
+        href = match.group(1)
+        texts += match.group(2) + '\n'
+    texts_arr = texts.split()
+    texts_arr = filter_data(key, texts_arr)
+    data['question_type'] = texts_arr[0]
+    data['title'] = texts_arr[1]
+    data['people'] = texts_arr[2]
+    data['reply_time'] = texts_arr[3]
+    data['create_time'] = texts_arr[4]
+    data['type'] = key
+    url = 'http://www.gzcgw.gov.cn%s' % href
+    return url, texts_arr, data
+
+
+def format_item_info(key, item_soup):
+    data = {}
+    contents = item_soup.find_all(class_="main-table-td02")
+    contents = filter_content(key, contents)
+    data['content'] = contents[3].get_text().replace(u'\xa0', u' ')
+    data['reply'] = contents[4].get_text().replace(u'\xa0', u' ')
+    return data
+
+
+def process_main_func(q, key, el):
+    item_url, texts_arr, content_data = format_page_info(key, el)
+    item_html = get_page_data(item_url)
+    item_data = format_item_info(key, item_html)
+    md5_str = md5(''.join(texts_arr) +
+                  item_data.get('content') + item_data.get('reply'))
+    q.put([md5_str, dict(**content_data, **item_data)])
+
+
+data = {
+    # 'zxjy': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/zxjy.portal',
+    # 'wtts': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/wtts.portal',
+    'jzxx': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/jzxx.portal'
+}
+
+
+pattern = '<a.href="([^"]*)"[^>]*>(.*)</a>'
+pattern_page = '<font.*[^>]*(.*)</font>'
+page = 1
+page_end = 1
+
 manager = Manager()
 q = manager.Queue()
 process_count = 8
@@ -79,113 +189,3 @@ for key, val in data.items():
         if page >= int(page_end):
             exit()
         page += 1
-
-
-def format_data(data):
-    course = {
-        'content_md5': data.get('content_md5'),
-        'title': data.get('title'),
-        'type': data.get('type'),
-        'question_type': data.get('question_type'),
-        'people': data.get('people'),
-        'content': data.get('content'),
-        'reply': data.get('reply'),
-        'reply_time': parse(data.get('reply_time')),
-        'create_time': parse(data.get('create_time'))
-    }
-    return course
-
-
-def filter_data(_type, data):
-    if _type == 'zxjy':
-        del data[1]
-        del data[3]
-
-    elif _type == 'wtts':
-        del data[3]
-
-    elif _type == 'jzxx':
-        return data
-    return data
-
-
-def filter_content(_type, data):
-    if _type == 'zxjy':
-        del data[3]
-
-    elif _type == 'wtts':
-        return data
-
-    elif _type == 'jzxx':
-        return data
-
-    return data
-
-
-conn = MongoClient('127.0.0.1', 27017)
-collection = conn.gz_data.all_content
-
-
-def md5(arg, code='utf-8'):
-    md5_pwd = hashlib.md5(bytes('gz', encoding=code))
-    md5_pwd.update(bytes(arg, encoding=code))
-    return md5_pwd.hexdigest()
-
-
-def get_page_data(url):
-    # response = requests.get(url, headers=headers, proxies=proxies)
-    response = requests.get(url, headers=headers)
-    response.encoding = 'utf-8'
-    soup = BeautifulSoup(response.text, 'html.parser')
-    return soup
-
-
-pattern = '<a.href="([^"]*)"[^>]*>(.*)</a>'
-pattern_page = '<font.*[^>]*(.*)</font>'
-page = 1
-page_end = 1
-
-
-def format_page_info(key, el):
-    data = {}
-    txt = html.unescape(str(el))
-    arr = re.finditer(pattern, txt)
-    href = texts = ''
-    for match in arr:
-        href = match.group(1)
-        texts += match.group(2) + '\n'
-    texts_arr = texts.split()
-    texts_arr = filter_data(key, texts_arr)
-    data['question_type'] = texts_arr[0]
-    data['title'] = texts_arr[1]
-    data['people'] = texts_arr[2]
-    data['reply_time'] = texts_arr[3]
-    data['create_time'] = texts_arr[4]
-    data['type'] = key
-    url = 'http://www.gzcgw.gov.cn%s' % href
-    return url, texts_arr, data
-
-
-def format_item_info(key, item_soup):
-    data = {}
-    contents = item_soup.find_all(class_="main-table-td02")
-    contents = filter_content(key, contents)
-    data['content'] = contents[3].get_text().replace(u'\xa0', u' ')
-    data['reply'] = contents[4].get_text().replace(u'\xa0', u' ')
-    return data
-
-
-def process_main_func(q, key, el):
-    item_url, texts_arr, content_data = format_page_info(key, el)
-    item_html = get_page_data(item_url)
-    item_data = format_item_info(key, item_html)
-    md5_str = md5(''.join(texts_arr) +
-                  item_data.get('content') + item_data.get('reply'))
-    q.put([md5_str, dict(**content_data, **item_data)])
-
-
-data = {
-    # 'zxjy': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/zxjy.portal',
-    # 'wtts': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/wtts.portal',
-    'jzxx': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/jzxx.portal'
-}
