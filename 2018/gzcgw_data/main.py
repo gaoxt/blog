@@ -26,11 +26,74 @@ headers = {
     'User-Agent': ua
 }
 
+manager = Manager()
+q = manager.Queue()
+process_count = 8
 
-def md5(arg, code='utf-8'):
-    md5_pwd = hashlib.md5(bytes('gz', encoding=code))
-    md5_pwd.update(bytes(arg, encoding=code))
-    return md5_pwd.hexdigest()
+for key, val in data.items():
+    page_flag = True
+    while True:
+        url = '%s?pageNo=%d' % (val, page)
+        soup = get_page_data(url)
+        category_id = soup.select("div.id")
+        page_info = soup.select(
+            "table.center-table-cgwyh-01-titlelist-02 font")
+        page_end = page_info[1].get_text().strip()
+
+        page_data = soup.select("table.list-cgwyh-01-titlelist-02 tr")[1:]
+        process_data = [page_data[n:n + process_count]
+                        for n in range(0, len(page_data), process_count)]
+        many_content = []
+        sleep_num = random.randint(1, 2)
+        time.sleep(sleep_num)
+
+        for i in range(len(process_data)):
+            print('total %d/%s  %d/%d sleep:%d' % (
+                page, page_end, i + 1, len(process_data), sleep_num))
+
+            p = Pool(process_count)
+            for n in range(0, len(process_data[i])):
+                p.apply_async(process_main_func, args=(
+                    q, key, str(process_data[i][n])))
+
+            p.close()
+            p.join()
+
+            while not q.empty():
+                item = q.get()
+                item_md5 = item[0]
+                if collection.find_one({'content_md5': item_md5}):
+                    page_flag = False
+                    continue
+
+                if item_md5 in [x.get('content_md5') for x in many_content]:
+                    continue
+
+                item_data = item[1]
+                item_data['content_md5'] = item_md5
+                many_content.append(item_data)
+
+        if many_content:
+            collection.insert_many(many_content)
+
+        if page >= int(page_end):
+            exit()
+        page += 1
+
+
+def format_data(data):
+    course = {
+        'content_md5': data.get('content_md5'),
+        'title': data.get('title'),
+        'type': data.get('type'),
+        'question_type': data.get('question_type'),
+        'people': data.get('people'),
+        'content': data.get('content'),
+        'reply': data.get('reply'),
+        'reply_time': parse(data.get('reply_time')),
+        'create_time': parse(data.get('create_time'))
+    }
+    return course
 
 
 def filter_data(_type, data):
@@ -63,19 +126,10 @@ conn = MongoClient('127.0.0.1', 27017)
 collection = conn.gz_data.all_content
 
 
-def format_data(data):
-    course = {
-        'content_md5': data.get('content_md5'),
-        'title': data.get('title'),
-        'type': data.get('type'),
-        'question_type': data.get('question_type'),
-        'people': data.get('people'),
-        'content': data.get('content'),
-        'reply': data.get('reply'),
-        'reply_time': parse(data.get('reply_time')),
-        'create_time': parse(data.get('create_time'))
-    }
-    return course
+def md5(arg, code='utf-8'):
+    md5_pwd = hashlib.md5(bytes('gz', encoding=code))
+    md5_pwd.update(bytes(arg, encoding=code))
+    return md5_pwd.hexdigest()
 
 
 def get_page_data(url):
@@ -135,57 +189,3 @@ data = {
     # 'wtts': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/wtts.portal',
     'jzxx': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/jzxx.portal'
 }
-
-manager = Manager()
-q = manager.Queue()
-process_count = 8
-
-for key, val in data.items():
-    page_flag = True
-    while True:
-        url = '%s?pageNo=%d' % (val, page)
-        soup = get_page_data(url)
-        category_id = soup.select("div.id")
-        page_info = soup.select(
-            "table.center-table-cgwyh-01-titlelist-02 font")
-        page_end = page_info[1].get_text().strip()
-
-        page_data = soup.select("table.list-cgwyh-01-titlelist-02 tr")[1:]
-        process_data = [page_data[n:n + process_count]
-                        for n in range(0, len(page_data), process_count)]
-        many_content = []
-        sleep_num = random.randint(1, 2)
-        time.sleep(sleep_num)
-
-        for i in range(len(process_data)):
-            print('total %d/%s  %d/%d sleep:%d' % (
-                page, page_end, i + 1, len(process_data), sleep_num))
-
-            p = Pool(process_count)
-            for n in range(0, len(process_data[i])):
-                p.apply_async(process_main_func, args=(
-                    q, key, str(process_data[i][n])))
-
-            p.close()
-            p.join()
-
-            while not q.empty():
-                item = q.get()
-                item_md5 = item[0]
-                if collection.find_one({'content_md5': item_md5}):
-                    page_flag = False
-                    continue
-
-                if item_md5 in [x.get('content_md5') for x in many_content]:
-                    continue
-
-                item_data = item[1]
-                item_data['content_md5'] = item_md5
-                many_content.append(item_data)
-
-        if many_content:
-            collection.insert_many(many_content)
-
-        if page >= int(page_end):
-            exit()
-        page += 1
