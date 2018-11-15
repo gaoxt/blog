@@ -21,43 +21,16 @@ proxies = {
 }
 
 
-def format_page_info(key, el):
-    data = {}
-    txt = html.unescape(str(el))
-    arr = re.finditer(pattern, txt)
-    href = texts = ''
-    for match in arr:
-        href = match.group(1)
-        texts += match.group(2) + '\n'
-    texts_arr = texts.split()
-    texts_arr = filter_data(key, texts_arr)
-    data['question_type'] = texts_arr[0]
-    data['title'] = texts_arr[1]
-    data['people'] = texts_arr[2]
-    data['reply_time'] = texts_arr[3]
-    data['create_time'] = texts_arr[4]
-    data['type'] = key
-    url = 'http://www.gzcgw.gov.cn%s' % href
-    return url, texts_arr, data
-
-
 ua = generate_user_agent()
 headers = {
     'User-Agent': ua
 }
 
 
-def filter_content(_type, data):
-    if _type == 'zxjy':
-        del data[3]
-
-    elif _type == 'wtts':
-        return data
-
-    elif _type == 'jzxx':
-        return data
-
-    return data
+def md5(arg, code='utf-8'):
+    md5_pwd = hashlib.md5(bytes('gz', encoding=code))
+    md5_pwd.update(bytes(arg, encoding=code))
+    return md5_pwd.hexdigest()
 
 
 def filter_data(_type, data):
@@ -70,6 +43,19 @@ def filter_data(_type, data):
 
     elif _type == 'jzxx':
         return data
+    return data
+
+
+def filter_content(_type, data):
+    if _type == 'zxjy':
+        del data[3]
+
+    elif _type == 'wtts':
+        return data
+
+    elif _type == 'jzxx':
+        return data
+
     return data
 
 
@@ -106,10 +92,24 @@ page = 1
 page_end = 1
 
 
-def md5(arg, code='utf-8'):
-    md5_pwd = hashlib.md5(bytes('gz', encoding=code))
-    md5_pwd.update(bytes(arg, encoding=code))
-    return md5_pwd.hexdigest()
+def format_page_info(key, el):
+    data = {}
+    txt = html.unescape(str(el))
+    arr = re.finditer(pattern, txt)
+    href = texts = ''
+    for match in arr:
+        href = match.group(1)
+        texts += match.group(2) + '\n'
+    texts_arr = texts.split()
+    texts_arr = filter_data(key, texts_arr)
+    data['question_type'] = texts_arr[0]
+    data['title'] = texts_arr[1]
+    data['people'] = texts_arr[2]
+    data['reply_time'] = texts_arr[3]
+    data['create_time'] = texts_arr[4]
+    data['type'] = key
+    url = 'http://www.gzcgw.gov.cn%s' % href
+    return url, texts_arr, data
 
 
 def format_item_info(key, item_soup):
