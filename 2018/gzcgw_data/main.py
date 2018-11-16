@@ -47,6 +47,26 @@ def md5(arg, code='utf-8'):
     return md5_pwd.hexdigest()
 
 
+def format_page_info(key, el):
+    data = {}
+    txt = html.unescape(str(el))
+    arr = re.finditer(pattern, txt)
+    href = texts = ''
+    for match in arr:
+        href = match.group(1)
+        texts += match.group(2) + '\n'
+    texts_arr = texts.split()
+    texts_arr = filter_data(key, texts_arr)
+    data['question_type'] = texts_arr[0]
+    data['title'] = texts_arr[1]
+    data['people'] = texts_arr[2]
+    data['reply_time'] = texts_arr[3]
+    data['create_time'] = texts_arr[4]
+    data['type'] = key
+    url = 'http://www.gzcgw.gov.cn%s' % href
+    return url, texts_arr, data
+
+
 def get_page_data(url):
     # response = requests.get(url, headers=headers, proxies=proxies)
     response = requests.get(url, headers=headers)
@@ -121,6 +141,7 @@ manager = Manager()
 q = manager.Queue()
 process_count = 8
 
+
 for key, val in data.items():
     page_flag = True
     while True:
@@ -170,23 +191,3 @@ for key, val in data.items():
         if page >= int(page_end):
             exit()
         page += 1
-
-
-def format_page_info(key, el):
-    data = {}
-    txt = html.unescape(str(el))
-    arr = re.finditer(pattern, txt)
-    href = texts = ''
-    for match in arr:
-        href = match.group(1)
-        texts += match.group(2) + '\n'
-    texts_arr = texts.split()
-    texts_arr = filter_data(key, texts_arr)
-    data['question_type'] = texts_arr[0]
-    data['title'] = texts_arr[1]
-    data['people'] = texts_arr[2]
-    data['reply_time'] = texts_arr[3]
-    data['create_time'] = texts_arr[4]
-    data['type'] = key
-    url = 'http://www.gzcgw.gov.cn%s' % href
-    return url, texts_arr, data
