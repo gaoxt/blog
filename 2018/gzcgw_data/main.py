@@ -47,6 +47,32 @@ def md5(arg, code='utf-8'):
     return md5_pwd.hexdigest()
 
 
+def get_page_data(url):
+    # response = requests.get(url, headers=headers, proxies=proxies)
+    response = requests.get(url, headers=headers)
+    response.encoding = 'utf-8'
+    soup = BeautifulSoup(response.text, 'html.parser')
+    return soup
+
+
+def process_main_func(q, key, el):
+    item_url, texts_arr, content_data = format_page_info(key, el)
+    item_html = get_page_data(item_url)
+    item_data = format_item_info(key, item_html)
+    md5_str = md5(''.join(texts_arr) +
+                  item_data.get('content') + item_data.get('reply'))
+    q.put([md5_str, dict(**content_data, **item_data)])
+
+
+def format_item_info(key, item_soup):
+    data = {}
+    contents = item_soup.find_all(class_="main-table-td02")
+    contents = filter_content(key, contents)
+    data['content'] = contents[3].get_text().replace(u'\xa0', u' ')
+    data['reply'] = contents[4].get_text().replace(u'\xa0', u' ')
+    return data
+
+
 def format_data(data):
     course = {
         'content_md5': data.get('content_md5'),
@@ -60,52 +86,6 @@ def format_data(data):
         'create_time': parse(data.get('create_time'))
     }
     return course
-
-
-def get_page_data(url):
-    # response = requests.get(url, headers=headers, proxies=proxies)
-    response = requests.get(url, headers=headers)
-    response.encoding = 'utf-8'
-    soup = BeautifulSoup(response.text, 'html.parser')
-    return soup
-
-
-def format_page_info(key, el):
-    data = {}
-    txt = html.unescape(str(el))
-    arr = re.finditer(pattern, txt)
-    href = texts = ''
-    for match in arr:
-        href = match.group(1)
-        texts += match.group(2) + '\n'
-    texts_arr = texts.split()
-    texts_arr = filter_data(key, texts_arr)
-    data['question_type'] = texts_arr[0]
-    data['title'] = texts_arr[1]
-    data['people'] = texts_arr[2]
-    data['reply_time'] = texts_arr[3]
-    data['create_time'] = texts_arr[4]
-    data['type'] = key
-    url = 'http://www.gzcgw.gov.cn%s' % href
-    return url, texts_arr, data
-
-
-def format_item_info(key, item_soup):
-    data = {}
-    contents = item_soup.find_all(class_="main-table-td02")
-    contents = filter_content(key, contents)
-    data['content'] = contents[3].get_text().replace(u'\xa0', u' ')
-    data['reply'] = contents[4].get_text().replace(u'\xa0', u' ')
-    return data
-
-
-def process_main_func(q, key, el):
-    item_url, texts_arr, content_data = format_page_info(key, el)
-    item_html = get_page_data(item_url)
-    item_data = format_item_info(key, item_html)
-    md5_str = md5(''.join(texts_arr) +
-                  item_data.get('content') + item_data.get('reply'))
-    q.put([md5_str, dict(**content_data, **item_data)])
 
 
 proxy = 'http://111.177.188.19:9999'
@@ -190,3 +170,23 @@ for key, val in data.items():
         if page >= int(page_end):
             exit()
         page += 1
+
+
+def format_page_info(key, el):
+    data = {}
+    txt = html.unescape(str(el))
+    arr = re.finditer(pattern, txt)
+    href = texts = ''
+    for match in arr:
+        href = match.group(1)
+        texts += match.group(2) + '\n'
+    texts_arr = texts.split()
+    texts_arr = filter_data(key, texts_arr)
+    data['question_type'] = texts_arr[0]
+    data['title'] = texts_arr[1]
+    data['people'] = texts_arr[2]
+    data['reply_time'] = texts_arr[3]
+    data['create_time'] = texts_arr[4]
+    data['type'] = key
+    url = 'http://www.gzcgw.gov.cn%s' % href
+    return url, texts_arr, data
