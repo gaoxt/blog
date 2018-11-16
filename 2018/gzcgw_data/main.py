@@ -14,22 +14,6 @@ import aiohttp
 import random
 from multiprocessing import Process, Queue, Pool, Manager
 
-proxy = 'http://111.177.188.19:9999'
-aio_proxy = 'http://119.101.112.63:9999'
-proxies = {
-    'http': proxy
-}
-
-
-ua = generate_user_agent()
-headers = {
-    'User-Agent': ua
-}
-
-
-conn = MongoClient('127.0.0.1', 27017)
-collection = conn.gz_data.all_content
-
 
 def filter_data(_type, data):
     if _type == 'zxjy':
@@ -122,6 +106,23 @@ def process_main_func(q, key, el):
     md5_str = md5(''.join(texts_arr) +
                   item_data.get('content') + item_data.get('reply'))
     q.put([md5_str, dict(**content_data, **item_data)])
+
+
+proxy = 'http://111.177.188.19:9999'
+aio_proxy = 'http://119.101.112.63:9999'
+proxies = {
+    'http': proxy
+}
+
+
+ua = generate_user_agent()
+headers = {
+    'User-Agent': ua
+}
+
+
+conn = MongoClient('127.0.0.1', 27017)
+collection = conn.gz_data.all_content
 
 
 data = {
