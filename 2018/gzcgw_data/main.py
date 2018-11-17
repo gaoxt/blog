@@ -34,6 +34,16 @@ headers = {
     'User-Agent': ua
 }
 
+data = {
+    # 'zxjy': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/zxjy.portal',
+    'wtts': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/wtts.portal',
+    'jzxx': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/jzxx.portal'
+}
+
+
+conn = MongoClient('127.0.0.1', 27017)
+collection = conn.gz_data.all_content
+
 
 def md5(arg, code='utf-8'):
     md5_pwd = hashlib.md5(bytes('gz', encoding=code))
@@ -67,8 +77,12 @@ def filter_content(_type, data):
     return data
 
 
-conn = MongoClient('127.0.0.1', 27017)
-collection = conn.gz_data.all_content
+def format_item_info(key, item_soup):
+    contents = item_soup.find_all(class_="main-table-td02")
+    contents = filter_content(key, contents)
+    data['content'] = contents[3].get_text().replace(u'\xa0', u' ')
+    data['reply'] = contents[4].get_text().replace(u'\xa0', u' ')
+    return data
 
 
 def format_data(data):
@@ -119,23 +133,6 @@ def format_page_info(key, el):
     return url, texts_arr, data
 
 
-def format_item_info(key, item_soup):
-    contents = item_soup.find_all(class_="main-table-td02")
-    contents = filter_content(key, contents)
-    data['content'] = contents[3].get_text().replace(u'\xa0', u' ')
-    data['reply'] = contents[4].get_text().replace(u'\xa0', u' ')
-    return data
-
-
-def process_main_func(q, key, el):
-    item_url, texts_arr, content_data = format_page_info(key, el)
-    item_html = get_page_data(item_url)
-    item_data = format_item_info(key, item_html)
-    md5_str = md5(''.join(texts_arr) +
-                  item_data.get('content') + item_data.get('reply'))
-    q.put([md5_str, dict(**content_data, **item_data)])
-
-
 async def as_get_content(q, url, key):
     # timeout = aiohttp.ClientTimeout(total=30)
     async with aiohttp.ClientSession(headers=headers) as session:
@@ -150,11 +147,14 @@ async def as_get_content(q, url, key):
             q.put([url, data])
 
 
-data = {
-    # 'zxjy': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/zxjy.portal',
-    'wtts': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/wtts.portal',
-    'jzxx': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/jzxx.portal'
-}
+def process_main_func(q, key, el):
+    item_url, texts_arr, content_data = format_page_info(key, el)
+    item_html = get_page_data(item_url)
+    item_data = format_item_info(key, item_html)
+    md5_str = md5(''.join(texts_arr) +
+                  item_data.get('content') + item_data.get('reply'))
+    q.put([md5_str, dict(**content_data, **item_data)])
+
 
 manager = Manager()
 q = manager.Queue()
