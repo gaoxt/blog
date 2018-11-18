@@ -8,23 +8,41 @@ from pymongo import MongoClient
 import re
 import html
 import hashlib
-import time
 import asyncio
 import aiohttp
-import random
 from multiprocessing import Process, Queue, Pool, Manager
 
-proxy = 'http://111.177.188.19:9999'
+proxy = 'http://119.101.112.9:9999'
 aio_proxy = 'http://119.101.112.63:9999'
 proxies = {
     'http': proxy
 }
 
+proxies_list = [
+    {'http': 'http://119.101.113.202:9999'},
+    {'http': 'http://119.101.117.21:9999'},
+    {'http': 'http://119.101.112.23:9999'},
+    {'http': 'http://119.101.116.226:9999'},
+    {'http': 'http://119.101.115.168:9999'},
+    {'http': 'http://119.101.112.9:9999'},
+    {'http': 'http://119.101.113.200:9999'},
+    {'http': 'http://119.101.114.248:9999'}
+]
 
 ua = generate_user_agent()
 headers = {
     'User-Agent': ua
 }
+
+data = {
+    # 'zxjy': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/zxjy.portal',
+    'wtts': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/wtts.portal',
+    'jzxx': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/jzxx.portal'
+}
+
+
+conn = MongoClient('127.0.0.1', 27017)
+collection = conn.gz_data.all_content
 
 
 def md5(arg, code='utf-8'):
@@ -59,8 +77,12 @@ def filter_content(_type, data):
     return data
 
 
-conn = MongoClient('127.0.0.1', 27017)
-collection = conn.gz_data.all_content
+def format_item_info(key, item_soup):
+    contents = item_soup.find_all(class_="main-table-td02")
+    contents = filter_content(key, contents)
+    data['content'] = contents[3].get_text().replace(u'\xa0', u' ')
+    data['reply'] = contents[4].get_text().replace(u'\xa0', u' ')
+    return data
 
 
 def format_data(data):
@@ -79,8 +101,7 @@ def format_data(data):
 
 
 def get_page_data(url):
-    # response = requests.get(url, headers=headers, proxies=proxies)
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, proxies=proxies)
     response.encoding = 'utf-8'
     soup = BeautifulSoup(response.text, 'html.parser')
     return soup
@@ -88,7 +109,7 @@ def get_page_data(url):
 
 pattern = '<a.href="([^"]*)"[^>]*>(.*)</a>'
 pattern_page = '<font.*[^>]*(.*)</font>'
-page = 1
+page = 12
 page_end = 1
 
 
@@ -112,13 +133,18 @@ def format_page_info(key, el):
     return url, texts_arr, data
 
 
-def format_item_info(key, item_soup):
-    data = {}
-    contents = item_soup.find_all(class_="main-table-td02")
-    contents = filter_content(key, contents)
-    data['content'] = contents[3].get_text().replace(u'\xa0', u' ')
-    data['reply'] = contents[4].get_text().replace(u'\xa0', u' ')
-    return data
+async def as_get_content(q, url, key):
+    # timeout = aiohttp.ClientTimeout(total=30)
+    async with aiohttp.ClientSession(headers=headers) as session:
+        async with session.get(url, proxy=proxy) as response:
+            content = await response.text()
+            soup = BeautifulSoup(content, 'html.parser')
+            contents = soup.find_all(class_="main-table-td02")
+            contents = filter_content(key, contents)
+            data = {}
+            data['content'] = contents[3].get_text().replace(u'\xa0', u' ')
+            data['reply'] = contents[4].get_text().replace(u'\xa0', u' ')
+            q.put([url, data])
 
 
 def process_main_func(q, key, el):
@@ -130,62 +156,60 @@ def process_main_func(q, key, el):
     q.put([md5_str, dict(**content_data, **item_data)])
 
 
-data = {
-    # 'zxjy': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/zxjy.portal',
-    # 'wtts': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/wtts.portal',
-    'jzxx': 'http://www.gzcgw.gov.cn/portal/site/site/portal/zmhd/jzxx.portal'
-}
-
 manager = Manager()
 q = manager.Queue()
-process_count = 8
-
 for key, val in data.items():
-    page_flag = True
     while True:
+        page_flag = True
         url = '%s?pageNo=%d' % (val, page)
         soup = get_page_data(url)
-        category_id = soup.select("div.id")
+
         page_info = soup.select(
             "table.center-table-cgwyh-01-titlelist-02 font")
         page_end = page_info[1].get_text().strip()
 
         page_data = soup.select("table.list-cgwyh-01-titlelist-02 tr")[1:]
-        process_data = [page_data[n:n + process_count]
-                        for n in range(0, len(page_data), process_count)]
         many_content = []
-        sleep_num = random.randint(1, 2)
-        time.sleep(sleep_num)
+        url_list = []
 
-        for i in range(len(process_data)):
-            print('total %d/%s  %d/%d sleep:%d' % (
-                page, page_end, i + 1, len(process_data), sleep_num))
+        page_content = {}
+        for el in page_data:
+            item_url, texts_arr, content_data = format_page_info(key, el)
+            url_list.append(item_url)
+            page_content[item_url] = {}
+            page_content[item_url]['content_data'] = content_data
+            page_content[item_url]['texts_arr'] = texts_arr
 
-            p = Pool(process_count)
-            for n in range(0, len(process_data[i])):
-                p.apply_async(process_main_func, args=(
-                    q, key, str(process_data[i][n])))
+        print('total %d/%s ' % (page, page_end))
 
-            p.close()
-            p.join()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(asyncio.wait(
+            [as_get_content(q, url, key) for url in url_list]))
+        loop.close()
 
-            while not q.empty():
-                item = q.get()
-                item_md5 = item[0]
-                if collection.find_one({'content_md5': item_md5}):
-                    page_flag = False
-                    continue
+        while not q.empty():
+            item = q.get()
+            item_url = item[0]
+            item_content = item[1]
+            item_data = page_content.get(item_url)
+            new_data = item_data.get('content_data')
+            md5_str = md5(''.join(item_data.get('texts_arr')) +
+                          item_content.get('content') + item_content.get('reply'))
 
-                if item_md5 in [x.get('content_md5') for x in many_content]:
-                    continue
+            if collection.find_one({'content_md5': md5_str}):
+                page_flag = False
+                continue
 
-                item_data = item[1]
-                item_data['content_md5'] = item_md5
-                many_content.append(item_data)
+            if md5_str in [x.get('content_md5') for x in many_content]:
+                continue
+
+            new_data['content_md5'] = md5_str
+            many_content.append(dict(**item_content, **new_data))
 
         if many_content:
             collection.insert_many(many_content)
 
-        if page >= int(page_end):
-            exit()
+        if page == page_end:
+            break
         page += 1
