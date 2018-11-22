@@ -26,6 +26,9 @@ headers = {
     'User-Agent': ua
 }
 
+conn = MongoClient('127.0.0.1', 27017)
+collection = conn.gz_data.all_content
+
 
 def filter_data(_type, data):
     if _type == 'zxjy':
@@ -53,8 +56,10 @@ def filter_content(_type, data):
     return data
 
 
-conn = MongoClient('127.0.0.1', 27017)
-collection = conn.gz_data.all_content
+def md5(arg, code='utf-8'):
+    md5_pwd = hashlib.md5(bytes('gz', encoding=code))
+    md5_pwd.update(bytes(arg, encoding=code))
+    return md5_pwd.hexdigest()
 
 
 def format_data(data):
