@@ -26,11 +26,6 @@ headers = {
     'User-Agent': ua
 }
 
-pattern = '<a.href="([^"]*)"[^>]*>(.*)</a>'
-pattern_page = '<font.*[^>]*(.*)</font>'
-page = 1
-page_end = 1
-
 
 def filter_data(_type, data):
     if _type == 'zxjy':
@@ -85,10 +80,10 @@ def get_page_data(url):
     return soup
 
 
-def md5(arg, code='utf-8'):
-    md5_pwd = hashlib.md5(bytes('gz', encoding=code))
-    md5_pwd.update(bytes(arg, encoding=code))
-    return md5_pwd.hexdigest()
+pattern = '<a.href="([^"]*)"[^>]*>(.*)</a>'
+pattern_page = '<font.*[^>]*(.*)</font>'
+page = 1
+page_end = 1
 
 
 def format_page_info(key, el):
