@@ -1,1 +1,0 @@
-db.auth('mongoadmin', '123456')
