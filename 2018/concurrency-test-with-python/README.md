@@ -14,6 +14,7 @@
 | 异步io           | test_asyncio           | 8890847 function calls (8890395 primitive calls) in 8.987 seconds  |
 | 多进程+异步io    | test_process_asyncio   | 11461 function calls (11376 primitive calls) in 3.916 seconds      |
 | 多线程+异步io    | test_thread_asyncio    | 1579 function calls (1577 primitive calls) in 5.990 seconds        |
+
 数据会受本地机器性能影响，所以只能参考。
 # using
 修改main.py里面__main__主函数的对应方法。
