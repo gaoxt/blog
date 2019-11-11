@@ -1,0 +1,9 @@
+version: "3"
+services:
+  master:
+    image: redis:3-alpine
+  slave:
+    image: redis:3-alpine
+    command: redis-server --slaveof redis-master 6379
+    links:
+      - master:redis-master
