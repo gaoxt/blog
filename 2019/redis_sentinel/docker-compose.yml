@@ -1,0 +1,17 @@
+version: "3"
+services:
+  master:
+    image: redis:3-alpine
+  slave:
+    image: redis:3-alpine
+    command: redis-server --slaveof redis-master 6379
+    links:
+      - master:redis-master
+  sentinel:
+    build: sentinel
+    environment:
+      - SENTINEL_DOWN_AFTER=3000
+      - SENTINEL_FAILOVER=3000
+    links:
+      - master:redis-master
+      - slave
