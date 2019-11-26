@@ -1,0 +1,9 @@
+daemonize yes
+bind 0.0.0.0
+port ${PORT}
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+appendonly yes
+dir /redis-data/${PORT}
+logfile "/redis-logs/redis${PORT}.log"

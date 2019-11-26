@@ -1,0 +1,7 @@
+version: "3"
+services:
+  node:
+    build: cluster
+    # environment:
+    #   - INITIAL_PORT=7000
+    #   - SLAVES_PER_MASTER=1
