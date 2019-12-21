@@ -18,6 +18,7 @@ git commit 之前会检查当前目录的所有 README.md 生成 directory 树�
 	 * [使用go-ethereum操作简单智能合约](2020/blockchain/inbox)
 	 * [使用go-ethereum在私链发布ERC20代币合约](2020/blockchain/erc20_demo)
  * 2019
+	 * [什么值得买价格监控微信推送](2019/zhidemai)
 	 * [nginx+flask+uwsgi的docker环境](2019/nginx_flask_uwsgi)
  * 2018
 	 * [haproxy+nginx/keepalive主从环境](2018/nginx_keepalived)
