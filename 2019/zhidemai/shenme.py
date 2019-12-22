@@ -34,14 +34,6 @@ UNIQUE (today,title,platform) ON CONFLICT REPLACE
 c.execute(sql)
 
 
-def get_comment_percent(comment, people):
-    percent = '0'
-    if people == 0:
-        return percent
-    percent = int(comment / (people) * 100)
-    return str(percent)
-
-
 def get_custom_time(html):
     day_time = re.sub("\D", "", html)
     if len(day_time) == 4:
@@ -53,6 +45,14 @@ def get_custom_time(html):
             day_time = time.strftime('%Y', time.localtime()) + day_time
     format = "%Y%m%d%H%M"
     return time.strftime("%Y-%m-%d", time.strptime(day_time, format))
+
+
+def get_comment_percent(comment, people):
+    percent = '0'
+    if people == 0:
+        return percent
+    percent = int(comment / (people) * 100)
+    return str(percent)
 
 
 def get_good_percent(good, bad):
