@@ -12,30 +12,7 @@ class interApi:
     userData = {}
     SESSION_id = ''
 
-    def registration(self):
-        url = "http://hd.interlib.cn/mb/main/index?libcode=ZJLIB"
-        res = self.session.get(url)
-        url = "http://hd.interlib.cn/mb/reader/getOpenid"
-        res = self.session.post(
-            url, data={'code': '', 'openid': self.userData['openid']})
-        print(res.text)
-
-        data = {
-            'rdid': self.userData['rdid'],
-            'rdname': self.userData['name'],
-            'rdcertify': self.userData['rdid'],
-            'rdloginid': self.userData['mobile'],
-            'openid': self.userData['openid'],
-        }
-        url = "http://hd.interlib.cn/mb/reader/registration"
-        res = self.session.post(url, headers={
-            'Referer': 'http://hd.interlib.cn/mb//reader/person'}, data=data).json()
-        print(res)
-        if res['code'] != 200:
-            exit('reg error')
-
-
-def __init__(self, userData, SESSION_id=''):
+    def __init__(self, userData, SESSION_id=''):
         self.userData = userData
         self.SESSION_id = SESSION_id
 
@@ -60,6 +37,29 @@ def __init__(self, userData, SESSION_id=''):
         # reg SESSION
         if not self.SESSION_id:
             self.registration()
+
+    def registration(self):
+        url = "http://hd.interlib.cn/mb/main/index?libcode=ZJLIB"
+        res = self.session.get(url)
+        url = "http://hd.interlib.cn/mb/reader/getOpenid"
+        res = self.session.post(
+            url, data={'code': '', 'openid': self.userData['openid']})
+        print(res.text)
+
+        data = {
+            'rdid': self.userData['rdid'],
+            'rdname': self.userData['name'],
+            'rdcertify': self.userData['rdid'],
+            'rdloginid': self.userData['mobile'],
+            'openid': self.userData['openid'],
+        }
+        url = "http://hd.interlib.cn/mb/reader/registration"
+        res = self.session.post(url, headers={
+            'Referer': 'http://hd.interlib.cn/mb//reader/person'}, data=data).json()
+        print(res)
+        if res['code'] != 200:
+            exit('reg error')
+
     def getPersonInfo(self):
         url = "http://hd.interlib.cn/mb/reader/person"
         res = self.session.get(url)
@@ -77,19 +77,6 @@ def __init__(self, userData, SESSION_id=''):
             userList += i.get_text("|", strip=True) + " "
         print(userName, userList)
 
-
-    def getDateId(self, specialId):
-        dateId = 0
-        url = "http://hd.interlib.cn/mb/activity/actEnterFor/"+str(specialId)
-        res = self.session.get(url, headers={
-            'Referer': 'http://hd.interlib.cn/mb/activity/actEnterFor/'+str(specialId)})
-        soup = BeautifulSoup(res.text, 'html5lib')
-        idText = soup.select("ul.act-center-cci li")
-        for i in idText:
-            dateId = i.get("value")
-            break
-        return dateId
-        
     def entry(self, specialId, dateId):
         data = {
             'specialId': specialId,
@@ -106,6 +93,17 @@ def __init__(self, userData, SESSION_id=''):
             flag = True
         return flag
 
+    def getDateId(self, specialId):
+        dateId = 0
+        url = "http://hd.interlib.cn/mb/activity/actEnterFor/"+str(specialId)
+        res = self.session.get(url, headers={
+            'Referer': 'http://hd.interlib.cn/mb/activity/actEnterFor/'+str(specialId)})
+        soup = BeautifulSoup(res.text, 'html5lib')
+        idText = soup.select("ul.act-center-cci li")
+        for i in idText:
+            dateId = i.get("value")
+            break
+        return dateId
 
     def activityList(self, day=''):
         specialId = 0
