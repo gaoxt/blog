@@ -38,6 +38,34 @@ class interApi:
         if not self.SESSION_id:
             self.registration()
 
+    def entry(self, specialId, dateId):
+        data = {
+            'specialId': specialId,
+            'dateids': dateId,
+            'attachDesc': '',
+            'carryNum': 0,
+        }
+        url = "http://hd.interlib.cn/mb/activity/entry"
+        res = self.session.post(url, headers={
+            'Referer': 'http://hd.interlib.cn/mb/activity/actEnterFor/'+str(specialId)}, data=data).json()
+        print(res)
+        flag = False
+        if res['code'] == 200:
+            flag = True
+        return flag
+
+    def getDateId(self, specialId):
+        dateId = 0
+        url = "http://hd.interlib.cn/mb/activity/actEnterFor/"+str(specialId)
+        res = self.session.get(url, headers={
+            'Referer': 'http://hd.interlib.cn/mb/activity/actEnterFor/'+str(specialId)})
+        soup = BeautifulSoup(res.text, 'html5lib')
+        idText = soup.select("ul.act-center-cci li")
+        for i in idText:
+            dateId = i.get("value")
+            break
+        return dateId
+
     def registration(self):
         url = "http://hd.interlib.cn/mb/main/index?libcode=ZJLIB"
         res = self.session.get(url)
@@ -76,34 +104,6 @@ class interApi:
                 break
             userList += i.get_text("|", strip=True) + " "
         print(userName, userList)
-
-    def entry(self, specialId, dateId):
-        data = {
-            'specialId': specialId,
-            'dateids': dateId,
-            'attachDesc': '',
-            'carryNum': 0,
-        }
-        url = "http://hd.interlib.cn/mb/activity/entry"
-        res = self.session.post(url, headers={
-            'Referer': 'http://hd.interlib.cn/mb/activity/actEnterFor/'+str(specialId)}, data=data).json()
-        print(res)
-        flag = False
-        if res['code'] == 200:
-            flag = True
-        return flag
-
-    def getDateId(self, specialId):
-        dateId = 0
-        url = "http://hd.interlib.cn/mb/activity/actEnterFor/"+str(specialId)
-        res = self.session.get(url, headers={
-            'Referer': 'http://hd.interlib.cn/mb/activity/actEnterFor/'+str(specialId)})
-        soup = BeautifulSoup(res.text, 'html5lib')
-        idText = soup.select("ul.act-center-cci li")
-        for i in idText:
-            dateId = i.get("value")
-            break
-        return dateId
 
     def activityList(self, day=''):
         specialId = 0
