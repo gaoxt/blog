@@ -62,4 +62,16 @@ func main() {
 	// 	log.Fatalf("TransferFrom err: %v \n", err)
 	// }
 	// fmt.Printf("tx sent: %s \n", tx.Hash().Hex())
+	
+	//两个用户余额查询
+	// var accountBalance = big.NewInt(0)
+	// if accountBalance, err = contract.BalanceOf(nil, auth.From); err != nil {
+	// 	log.Fatalf("get Balances err: %v \n", err)
+	// }
+	// fmt.Println(accountBalance)
+
+	// if accountBalance, err = contract.BalanceOf(nil, common.HexToAddress("0xf490774d9b87f4d379c2a789e5755156c1c370bc")); err != nil {
+	// 	log.Fatalf("get Balances err: %v \n", err)
+	// }
+	// fmt.Println(accountBalance)
 }
