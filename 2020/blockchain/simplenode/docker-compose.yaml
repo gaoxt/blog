@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  simplenode:
+    image: ethereum/client-go:latest
+    container_name: simplenode
+    environment:
+      datadir: node0
+    command: --allow-insecure-unlock --syncmode "fast" --verbosity=5 --nousb --networkid 150 --nodiscover --maxpeers=0 --datadir=/opt/node0 --rpc --rpcaddr=0.0.0.0 --rpcport=8545 --rpccorsdomain='*' --rpcapi=admin,db,debug,eth,miner,net,personal,shh,txpool,web3
+    ports:
+      - 8545:8545
+      - 30303:30303
+    volumes:
+      - .:/opt
