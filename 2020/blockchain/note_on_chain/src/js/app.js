@@ -1,4 +1,4 @@
-App = {
+var App = {
   web3Provider: null,
   contracts: {},
 
@@ -56,7 +56,7 @@ App = {
 
   loadNote: function (index) {
     App.noteIntance.notes(App.account, index).then(function (note) {
-      $("#notes").append('<a href="#" class="list-group-item index_' + index + '" data-index="' + index + '" data-toggle="modal" data-target="#modify-model"><p class="list-group-item-text">' + note + '</p></a>');
+      $("#notes").append(createHtmlTemplate(index, note));
       if (index - 1 >= 0) {
         App.loadNote(index - 1);
       }
@@ -77,18 +77,17 @@ App = {
 
   addNotes: function (btn) {
     if ($("#new_note").val() == '') {
-      return
+      return;
     }
-    btn.button('loading')
+    btn.button('loading');
     App.noteIntance.addNote($("#new_note").val()).then(function (result) {
-      $("#notes").prepend('<a href="#" class="list-group-item index_' + (++App.noteLength) + '" data-index="' + (App.noteLength + 1) + '"><p class="list-group-item-text">' + $("#new_note").val() + '</p></a>');
+      $("#notes").prepend(createHtmlTemplate(App.noteLength, $("#new_note").val()));
       $("#new_note").val('')
     }).catch(function (err) {
       console.log(err);
     }).finally(function () {
       btn.button('reset')
     });
-
   },
 
   updateNotes: function (btn) {
@@ -104,8 +103,9 @@ App = {
   },
 
   bindEvents: function () {
-    $("#add_new").on('click', function () {
+    $("#add_new").on('click', function (e) {
       App.addNotes($(this))
+      return;
     });
     $('#modify-model').on('show.bs.modal', function (event) {
       App.currentIndex = $(event.relatedTarget).data('index');
@@ -116,6 +116,10 @@ App = {
     })
   }
 };
+
+function createHtmlTemplate(index, note) {
+  return '<a href="#" class="list-group-item index_' + index + '" data-index="' + index + '" data-toggle="modal" data-target="#modify-model"><p class="list-group-item-text">' + note + '</p></a>'
+}
 
 $(function () {
   $(window).load(function () {
