@@ -1,0 +1,70 @@
+<!-- templates/index.tmpl -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>SimpleNote On Chain</title>
+
+  <!-- Bootstrap -->
+  <link href="src/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12 col-sm-8 col-sm-push-2">
+        <h1 class="text-center">SimpleNote On Chain</h1>
+        <hr />
+        <br />
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group text-center">
+        <textarea class="form-control" rows="3" id="new_note"></textarea>
+        <button class="btn btn-primary" id="add_new" style="margin-top:10px">添加笔记</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div id="notes" class="list-group"></div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modify-model" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Modify</h4>
+        </div>
+        <div class="modal-body">
+          <textarea class="form-control" rows="3" id="modify_note"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="change">Save</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <script src="src/js/bootstrap.min.js"></script>
+  <script src="src/js/app.js"></script>
+</body>
+
+</html>
