@@ -23,6 +23,7 @@ git commit 之前会检查当前目录的所有 README.md 生成 directory 树�
 	 * [nginx+flask+uwsgi的docker环境](2019/nginx_flask_uwsgi)
  * 2018
 	 * [haproxy+nginx/keepalive主从环境](2018/nginx_keepalived)
+	 * [使用scale对nginx进行水平扩容](2018/nginx_haproxy_scale)
 	 * [python+mongo-express数据抓取展示](2018/gzcgw_data)
 	 * [python并发性能测试脚本](2018/concurrency_test_with_python)
  * 2017

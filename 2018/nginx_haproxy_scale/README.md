@@ -1,3 +1,6 @@
+# name
+使用scale对nginx进行水平扩容
+
 # description
 haproxy作为网关入口，分发请求到nginx，nginx通过docker-compose的scale进行扩容为2台，测试了双机热备(故障切换)、单点故障的情况。
 
