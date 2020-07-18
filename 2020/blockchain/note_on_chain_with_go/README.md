@@ -1,9 +1,10 @@
-## Description
-```
-一个增改查的记事本Dapp
-```
+# name
+Golang开发一个增改查的Dapp记事本
 
-## Usage
+# Description
+[用Golang开发一个增改查的Dapp记事本](https://blog.csdn.net/qq624202120/article/details/107128214)
+
+# Usage
 
 修改 service/NoteService.go 的合约相关配置
 | 名称              |                              当前值                              |   作用   |
@@ -21,8 +22,5 @@ go run main.go
 访问
 http://localhost:4000
 
-[具体功能介绍和使用教程](https://blog.csdn.net/qq624202120/article/details/107128214)
-
 ### 新增和修改笔记效果
- ![exploit](https://github.com/gaoxt/blogDemo/blob/master/2020/blockchain/note_on_chain_with_go/src/images/add_update.gif?raw=true)
-
+ ![exploit](src/images/add_update.gif)

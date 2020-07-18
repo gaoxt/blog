@@ -1,6 +1,7 @@
-# description
-haproxy + nginx/keepalive 的 一套主从配置
+# name
+haproxy+nginx/keepalive主从环境
 
+# description
 实现：双机热备(故障切换)，VIP漂移(故障移回)，测试了单点故障的情况。
 
 # using

@@ -1,5 +1,8 @@
+# name
+lnmp的docker-compose的基本环境
+
 # description
-nginx1.12 + mysql5.6 + php56 的 一套基本环境
+nginx1.12 + mysql5.6 + php56 
 
 其中环境变量通过 local.env 文件加载进 docker容器中，再通过php56/www.conf 配置 include<local.env>到php-fpm中，所以php中的 $_SERVER 全局变量能获取得到。
 

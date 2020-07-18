@@ -1,5 +1,5 @@
 # name
-nginx+flask+uwsgi 的 docker 环境
+nginx+flask+uwsgi的docker环境
 
 # description
 需要安装的扩展包填在requirements.txt里
