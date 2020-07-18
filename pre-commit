@@ -22,18 +22,20 @@ def allPath(dirname, current_reademe):
 
 
 # get README.md title
-def getReadmeContent(file, title):
+def getReadmeContent(file, title, full=False):
     data = ""
     file_source = ""
     with io.open(file, "r", encoding="utf-8") as f:
         file_source += f.read()
     # match # title all-line until hit # or \Z
     it = re.finditer(
-        r"^#.+?"+title+"((?:.*\n+.+)*?)(?=(?:\n+#|\Z))", file_source.strip(), re.M)
+        r"^(#.+?"+title+"((?:.*\n+.+)*?))(?=(?:\n+#|\Z))", file_source.strip(), re.M)
     for match in it:
-        data = match.group(1).strip()
+        data = match.group(2).strip()
+        if full == True:
+            data = match.group(1).strip()
     if data == "":
-        print("not match %s title , check %s" % (title, file))
+        print("No %s title match, please check your %s" % (title, file))
         exit(1)
     return data
 
@@ -71,10 +73,14 @@ def iterdict(d, span=''):
 
 # replace main README.md
 def replaceFile(new_content, file, title="directory"):
+    new_content = "# "+title+"\n"+new_content
     old_source = ""
     with io.open(file, "r", encoding="utf-8") as f:
         old_source += f.read()
-    content = getReadmeContent(file, title)
+    content = getReadmeContent(file, title, True)
+    if content.strip() == new_content.strip():
+        print("The README tree has not changed")
+        exit(0)
     new_source = old_source.strip().replace(content, new_content, 1)
     with io.open(file, "w", encoding="utf-8") as f:
         f.write(new_source)

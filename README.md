@@ -1,6 +1,13 @@
 # description
 个人练习项目存档
 
+# githook
+README.md 目录树生成使用方式
+pre-commit 文件放置至 .git/hooks/pre-commit，增加可执行权限。
+```bash
+chmod +x .git/hooks/pre-commit
+```
+git commit 之前会检查当前目录的所有 README.md 生成 directory 树。
 
 # directory
  * 2020
