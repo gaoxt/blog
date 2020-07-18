@@ -1,3 +1,5 @@
+# name
+理解php中的控制反转IOC、依赖注入DI、容器和后期静态绑定
 
 # description
 [xdebug分析php中的控制反转IOC、依赖注入DI、容器和后期静态绑定](https://blog.csdn.net/qq624202120/article/details/58593187)
