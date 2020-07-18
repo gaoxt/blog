@@ -26,5 +26,7 @@ git commit 之前会检查当前目录的所有 README.md 生成 directory 树�
 	 * [python+mongo-express数据抓取展示](2018/gzcgw_data)
 	 * [python并发性能测试脚本](2018/concurrency_test_with_python)
  * 2017
+	 * [单机nginx负载均衡到多台php-fpm的环境](2017/docker/upstream_of_php)
+	 * [主nginx反向代理到多台从nginx进行负载均衡](2017/docker/upstream_of_nginx)
 	 * [lnmp的docker-compose的基本环境](2017/docker/lnmp)
 	 * [tp3和tp5性能分析xdebug环境](2017/docker/docker_tp3_and_tp5)

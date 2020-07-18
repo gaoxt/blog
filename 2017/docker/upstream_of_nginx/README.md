@@ -1,3 +1,6 @@
+# name 
+主nginx反向代理到多台从nginx进行负载均衡
+
 # description
 master nginx 分发请求到 nginx_1 和 nginx_2
 过程中停止nginx_1等待片刻发现请求页面为nginx_2
