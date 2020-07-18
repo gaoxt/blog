@@ -1,0 +1,92 @@
+#!/usr/local/bin/python3
+
+import os
+import re
+import io
+import git
+
+
+# get all README.md
+def allPath(dirname, current_reademe):
+    result = []
+    for root, dirs, files in os.walk(dirname):
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        for filename in files:
+            if filename.endswith(('md')):
+                apath = os.path.join(root, filename)
+                result.append(apath)
+    # remove current README.md
+    if current_reademe in result:
+        result.remove(current_reademe)
+    return result
+
+
+# get README.md title
+def getReadmeContent(file, title):
+    data = ""
+    file_source = ""
+    with io.open(file, "r", encoding="utf-8") as f:
+        file_source += f.read()
+    # match # title all-line until hit # or \Z
+    it = re.finditer(
+        r"^#.+?"+title+"((?:.*\n+.+)*?)(?=(?:\n+#|\Z))", file_source.strip(), re.M)
+    for match in it:
+        data = match.group(1).strip()
+    if data == "":
+        print("not match %s title , check %s" % (title, file))
+        exit(1)
+    return data
+
+
+# format files dict
+def formatFiles(readme_files, title="name"):
+    data = {}
+    for file in readme_files:
+        content = getReadmeContent(file, title)
+        if content == "":
+            continue
+        file = file.replace(os.path.abspath('.')+"/", "", 1)
+        url_cuts = file.split('/')
+        url_path = [i for i in url_cuts if i not in ['.', 'README.md']]
+        if url_cuts[0] not in data:
+            data[url_cuts[0]] = []
+        data[url_cuts[0]].append("["+content+"]("+"/".join(url_path)+")")
+    return data
+
+
+# example: {2020: [], 2021: {01: []}}
+def iterdict(d, span=''):
+    data = ""
+    for k, val in d.items():
+        data += span+" * "+k+"\n"
+        if isinstance(val, dict):
+            iterdict(val, span+'\t')
+        elif isinstance(val, list):
+            for v in val:
+                data += span+'\t'+' * '+v+"\n"
+        else:
+            data += span+" * "+v+"\n"
+    return data
+
+
+# replace main README.md
+def replaceFile(new_content, file, title="directory"):
+    old_source = ""
+    with io.open(file, "r", encoding="utf-8") as f:
+        old_source += f.read()
+    content = getReadmeContent(file, title)
+    new_source = old_source.strip().replace(content, new_content, 1)
+    with io.open(file, "w", encoding="utf-8") as f:
+        f.write(new_source)
+    print("done")
+
+
+main_reademe_path = os.path.abspath('.')+'/README.md'
+readme_files = allPath(os.path.abspath('.'), main_reademe_path)
+readme_files.sort(reverse=True)
+readme_lists = formatFiles(readme_files)
+readme_source = iterdict(readme_lists)
+replaceFile(readme_source, main_reademe_path)
+
+g = git.cmd.Git(os.path.abspath('.'))
+g.add(main_reademe_path)
