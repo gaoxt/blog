@@ -1,3 +1,6 @@
+# name
+redis多哨兵多主从环境
+
 # description
 1个master+2个slave+3个sentinel的docker测试环境，验证了单节点的故障手动移回和故障自动切换。
 相比主从模式减少了人工干预自动切换主服务器。

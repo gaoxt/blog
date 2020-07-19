@@ -1,3 +1,5 @@
+# name
+redis-cluster多机主从水平扩容集群环境
 
 # description
 每个node下会自动启动2个以上的redis，端口分别是7000和7001，集群分片时做master/slave。测试了新增节点、减少节点、重写分片插槽的功能。

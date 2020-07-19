@@ -1,3 +1,6 @@
+# name
+redis-cluster单机多节点集群环境
+
 # description
 使用了5个master，每个master配1个slave。
 redis5版本开始自带类似redis-trib.rb的自动工具，包含了节点通信、分配槽、手动的进行主从复制等工作。

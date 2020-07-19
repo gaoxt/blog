@@ -1,3 +1,6 @@
+# name
+redis主从环境
+
 # description
 master不需要配置，slave服务器使用 --slaveof 指定master的ip和端口即可，从库一般是只读权限。
 
