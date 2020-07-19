@@ -1,3 +1,6 @@
+# name
+nginx+varnish负载均衡和静态缓存环境
+
 # description
 varnish作为前端，转发到2台nginx，建立round_robin的负载均衡，通过健康检查自动切换。测试了单点故障、缓存手动清除的情况。 
 
