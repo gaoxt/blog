@@ -1,0 +1,9 @@
+secretGenerator:
+  - name: mysql-pass
+    literals:
+      - password=123456
+resources:
+  - local-storage.yaml
+  - mysql-deployment.yaml
+  - php-deployment.yaml
+  - nginx-deployment.yaml

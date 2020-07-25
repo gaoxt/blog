@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc
+  labels:
+    app: lnmp-nginx
+spec:
+  type: LoadBalancer #直接暴露，更多功能可以用Ingress代替。
+  ports:
+    - port: 80
+  selector:
+    app: lnmp-nginx
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  conf: |
+    server {
+        listen 80;
+        server_name _;
+        root /var/www/html;
+        index index.html index.php;
+        location / {
+          try_files $uri $uri/ /index.php;
+        }
+        location ~ \.php$ {
+            include fastcgi_params;
+            fastcgi_pass php-fpm-svc:9000;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            
+        }
+    }
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: lnmp-nginx
+spec:
+  selector:
+    matchLabels:
+      app: lnmp-nginx
+  template:
+    metadata:
+      labels:
+        app: lnmp-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.19.1-alpine
+          volumeMounts:
+            - name: code
+              mountPath: "/var/www/html"
+              subPath: wordpress
+            - name: config
+              mountPath: /etc/nginx/conf.d #覆盖并清空conf.d目录
+      volumes:
+        - name: code
+          persistentVolumeClaim:
+            claimName: local-volume-claim
+        - name: config
+          configMap:
+            name: nginx-config
+            items:
+              - key: conf
+                path: www.conf

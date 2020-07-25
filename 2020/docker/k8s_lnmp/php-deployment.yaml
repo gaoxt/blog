@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-fpm-svc
+  labels:
+    app: lnmp-php
+spec:
+  ports:
+    - port: 9000
+  selector:
+    app: lnmp-php
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-fpm
+  labels:
+    app: lnmp-php
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lnmp-php
+  template:
+    metadata:
+      labels:
+        app: lnmp-php
+    spec:
+      containers:
+        - name: php
+          image: k8s-php7-fpm
+          imagePullPolicy: Never #本地仓库查找
+          env:
+            - name: WORDPRESS_DB_HOST
+              value: mysql-svc
+            - name: WORDPRESS_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: password
+          volumeMounts:
+            - name: code
+              mountPath: "/var/www/html"
+              subPath: wordpress
+      volumes:
+        - name: code
+          persistentVolumeClaim:
+            claimName: local-volume-claim

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: PersistentVolume #一个pv对应一个pvc，pv为集群资源由管理员创建，pvc为用户请求由用户申请。
+metadata:
+  name: local-volume
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/Users/gaox/work/docker_k8s/lnmp/local_storage" #绝对路径,行
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: local-volume-claim
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
