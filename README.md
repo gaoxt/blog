@@ -19,6 +19,7 @@ git commit 之前会检查当前目录的所有 README.md 生成 directory 树�
 	 * [Truffle开发一个增改查的Dapp记事本](2020/blockchain/note_on_chain)
 	 * [使用go-ethereum操作简单智能合约](2020/blockchain/inbox)
 	 * [使用go-ethereum在私链发布ERC20代币合约](2020/blockchain/erc20_demo)
+	 * [2020-PTA算法题解](2020/PTA)
  * 2019
 	 * [什么值得买价格监控微信推送](2019/zhidemai)
 	 * [redis多哨兵多主从环境](2019/redis_sentinel)

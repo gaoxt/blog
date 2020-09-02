@@ -1,0 +1,8 @@
+version: "3"
+services:
+  gcc-6.5:
+    container_name: gcc6
+    image: gcc:6.5.0
+    command: tail -f /dev/null
+    volumes:
+      - .:/data
