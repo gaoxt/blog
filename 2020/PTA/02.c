@@ -1,3 +1,6 @@
+/*
+    02-线性结构1 两个有序链表序列的合并 (15分)
+*/
 #include <stdio.h>
 #include <stdlib.h>
 

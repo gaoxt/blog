@@ -21,24 +21,21 @@ Position BinarySearch(List L, ElementType X);
 int main()
 {
     List L;
-    ElementType X;
+    ElementType X = 31;
     Position P;
-
-    L = ReadInput();
-    scanf("%d", &X);
+    int arr[] = {12, 31, 55, 89, 101};
+    L = ReadInput(arr, 5);
     P = BinarySearch(L, X);
     printf("%d\n", P);
 
     return 0;
 }
 
-List ReadInput()
+List ReadInput(int arr[], int n)
 {
     List L;
     L = (List)malloc(sizeof(struct LNode));
-    int arr[] = {12, 31, 55, 89};
-    int len = sizeof(arr) / sizeof(arr[1]);
-    for (int i = 0; i < len; i++)
+    for (int i = 0; i < n; i++)
     {
         L->Data[i + 1] = arr[i];
         L->Last++;
@@ -50,6 +47,7 @@ Position BinarySearch(List L, ElementType X)
 {
 
     int left = 1, right = L->Last, mid;
+
     while (left <= right)
     {
         if (L->Data[left] == X)
@@ -69,6 +67,5 @@ Position BinarySearch(List L, ElementType X)
             right = mid - 1;
         }
     }
-    if (left > right)
-        return NotFound;
+    return NotFound;
 }
