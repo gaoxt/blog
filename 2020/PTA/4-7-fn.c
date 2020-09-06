@@ -73,6 +73,7 @@ int main()
     return 0;
 }
 /* 你的代码将被嵌在这里 */
+//前序递归遍历
 void PreorderTraversal(BinTree BT)
 {
     if (BT)
@@ -82,6 +83,7 @@ void PreorderTraversal(BinTree BT)
         PreorderTraversal(BT->Right);
     }
 }
+//中序递归遍历
 void InorderTraversal(BinTree BT)
 {
     if (BT)
@@ -153,6 +155,12 @@ Position Find(BinTree BST, ElementType X)
     return NULL;
 }
 
+/*
+三种情况：
+1.要删除的X是叶子结点，直接拿掉。
+2.要删除的X有一个孩子，把X的上一个结点指向它的孙子结点。
+3.要删除的X左右两边都有孩子，用右子树最小元或左子树最大元代替它。
+*/
 BinTree Delete(BinTree BST, ElementType X)
 {
     if (!BST)
@@ -162,6 +170,7 @@ BinTree Delete(BinTree BST, ElementType X)
     }
 
     Position Tmp;
+    //删除结点X比当前结点Data大或小，通过递归找到X。
     if (X > BST->Data)
     {
         BST->Right = Delete(BST->Right, X);
@@ -172,6 +181,7 @@ BinTree Delete(BinTree BST, ElementType X)
     }
     else
     {
+        //找到X后，发现X有左右子结点，找到右树最小元或左树最大元代替被删结点。
         if (BST->Left && BST->Right)
         {
             Tmp = FindMin(BST->Right);
@@ -181,6 +191,7 @@ BinTree Delete(BinTree BST, ElementType X)
         else
         {
             Tmp = BST;
+            //X有一个孩子的情况，BST直接指向下一个结点。
             if (!BST->Left)
                 BST = BST->Right;
             else if (!BST->Right)

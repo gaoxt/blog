@@ -34,7 +34,8 @@ int main()
 List ReadInput(int arr[], int n)
 {
     List L;
-    L = (List)malloc(sizeof(struct LNode));
+    L = malloc(sizeof(List));
+    L->Last = 0; //避免野指针
     for (int i = 0; i < n; i++)
     {
         L->Data[i + 1] = arr[i];
@@ -43,6 +44,7 @@ List ReadInput(int arr[], int n)
     return L;
 }
 
+//二分法，一个有序数组内，每次查找下标总量/2进行左右对比。
 Position BinarySearch(List L, ElementType X)
 {
 
@@ -54,8 +56,7 @@ Position BinarySearch(List L, ElementType X)
             return left;
         if (L->Data[right] == X)
             return right;
-        mid = left + ((right - left) / 2);
-        // printf("left:%d right:%d mid:%d \n\r", left, right, mid);
+        mid = (left + right) / 2;
         if (L->Data[mid] == X)
             return mid;
         if (L->Data[mid] < X)

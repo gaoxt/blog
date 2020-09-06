@@ -68,16 +68,18 @@ List Merge(List L1, List L2)
 {
     List pa, pb, pc, L;
     L = (List)malloc(sizeof(struct Node));
+    //把头除外的链指给pa、pb
     pa = L1->Next;
     pb = L2->Next;
     pc = L;
     while (pa && pb)
     {
+        //比较两头链数据，每次给L追加较小的数，直到pa或pb某个遍历完。
         if (pa->Data <= pb->Data)
         {
-            pc->Next = pa;
-            pc = pa;
-            pa = pa->Next;
+            pc->Next = pa; //为L追加已下移的数据(给L织毛衣)
+            pc = pa;       //pc进位，方便pc->Next指向下一个。
+            pa = pa->Next; //指针下移
         }
         else
         {
@@ -86,6 +88,7 @@ List Merge(List L1, List L2)
             pb = pb->Next;
         }
     }
+    //pa遍历比较完了，说明pb中还有大的数据，追加到L后。
     pc->Next = pa ? pa : pb;
     L1->Next = NULL;
     L2->Next = NULL;
