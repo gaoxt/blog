@@ -36,14 +36,14 @@ struct GNode
 typedef PtrToGNode MGraph; //以邻接矩阵存储的图类型
 void FindAnimal(MGraph Graph);
 MGraph CreateGraph(int VertexNum);
-MGraph BuildGarph();
+MGraph BuildGraph();
 void InsertEdge(MGraph Graph, Edge E);
 void Floyd(MGraph Graph, WeighType D[][MaxVertexNum]);
 int FindMaxDist(WeighType D[][MaxVertexNum], Vertex i, int N);
 
 int main()
 {
-    MGraph G = BuildGarph();
+    MGraph G = BuildGraph();
     FindAnimal(G);
     return 0;
 }
@@ -75,7 +75,7 @@ void InsertEdge(MGraph Graph, Edge E)
     Graph->G[E->V2][E->V1] = E->Weight;
 }
 
-MGraph BuildGarph()
+MGraph BuildGraph()
 {
     MGraph Graph;
     Edge E;
