@@ -12,7 +12,7 @@
 
 //MGraph定义的程序头
 #define MaxVertexNum 100 //最大顶点数
-#define INFINTTY 65535   //无穷大的最短路径，无符号整数
+#define INFINITY 65535   //无穷大的最短路径，无符号整数
 typedef int Vertex;      //用顶点下标表示顶点
 typedef int WeighType;   //边的权值类型
 
@@ -61,7 +61,7 @@ MGraph CreateGraph(int VertexNum)
     {
         for (W = 0; W < Graph->Nv; W++)
         {
-            Graph->G[V][W] = INFINTTY;
+            Graph->G[V][W] = INFINITY;
         }
     }
     return Graph;
@@ -152,13 +152,13 @@ void FindAnimal(MGraph Graph)
     Floyd(Graph, D);
 
     //先定义一个无穷大的最短路径
-    MinDist = INFINTTY;
+    MinDist = INFINITY;
     for (i = 0; i < Graph->Nv; i++)
     {
         //找出第i个动物 到 其他动物 最长的距离
         MaxDist = FindMaxDist(D, i, Graph->Nv);
         //返回无穷大说明，从i开始 至少有个动物无法到达。
-        if (MaxDist == INFINTTY)
+        if (MaxDist == INFINITY)
         {
             printf("0\n");
             return;
