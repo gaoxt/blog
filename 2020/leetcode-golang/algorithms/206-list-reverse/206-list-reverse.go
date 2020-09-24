@@ -9,7 +9,7 @@ type ListNode = structures.ListNode
 /**
  *	解题思路：
  *	1.双指针，通过一个临时指针保存next的位置，把当前指针不断写给新链表。
- *	2.递归，递归到最后一个，开始不断往前回溯截断给新链表。
+ *	2.递归，递归到最后一个，开始不断往前截断给新链表。
  */
 
 func reverseList(head *ListNode) *ListNode {
