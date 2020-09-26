@@ -1,13 +1,14 @@
 package algorithms
 
-import (
-	"github.com/leetcode-golang/structures"
-)
+import "github.com/leetcode-golang/structures"
 
 type ListNode = structures.ListNode
 
 /**
- *	解题思路：拼链法
+ *	解题思路：
+ *	1.拼链法
+ *	2.递归法
+ *	3.迭代链接反转
  */
 
 func reverseList(head *ListNode, m, n int) *ListNode {
@@ -41,4 +42,34 @@ func reverseList(head *ListNode, m, n int) *ListNode {
 		}
 	}
 	return newhead
+}
+
+//反转前 n 个元素，参考list-reverse-part
+var successor *ListNode = nil //记录要链的下一个节点
+func reverseN(head *ListNode, n int) *ListNode {
+	if head == nil || head.Next == nil {
+		return head
+	}
+	if n == 1 {
+		successor = head.Next
+		return head
+	}
+	last := reverseN(head.Next, n-1)
+	head.Next.Next = head
+	head.Next = successor
+	return last
+}
+
+func reverseBetween(head *ListNode, m, n int) *ListNode {
+	if head == nil || head.Next == nil {
+		return head
+	}
+	if m == 1 {
+		// m等于1相当于反转前 n 个元素
+		return reverseN(head, n)
+	}
+	// 前进到反转的起点触发。
+	head.Next = reverseBetween(head.Next, m-1, n-1)
+	return head
+
 }

@@ -40,7 +40,7 @@ func Test_Problem(t *testing.T) {
 
 	for _, q := range qs {
 		_, p := q.ans, q.para
-		fmt.Printf("【input】:%v  【output】:%v\n", p, structures.List2Ints(reverseList(structures.Ints2List(p.one), p.m, p.n)))
+		fmt.Printf("【input】:%v  【output】:%v\n", p, structures.List2Ints(reverseBetween(structures.Ints2List(p.one), p.m, p.n)))
 	}
 	fmt.Printf("\n\n\n")
 }
