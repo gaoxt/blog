@@ -1,21 +1,22 @@
 package algorithms
 
-import "github.com/leetcode-golang/structures"
+import (
+	"github.com/leetcode-golang/structures"
+)
 
 type ListNode = structures.ListNode
 
 /**
  *	解题思路：
- *	1.拼链法
- *	2.递归法
- *	3.迭代链接反转
+ *	1.reverseList 拼链迭代法
+ *	2.reverseBetween 递归法
+ *	3.reverseIteration 顺序拼链迭代法，结构清晰。
  */
 
 func reverseList(head *ListNode, m, n int) *ListNode {
 	if m == n || head.Next == nil {
 		return head
 	}
-
 	count := 0
 	var newhead = head                           //链表开头
 	var pre *ListNode = nil                      //反转的链表
@@ -70,6 +71,41 @@ func reverseBetween(head *ListNode, m, n int) *ListNode {
 	}
 	// 前进到反转的起点触发。
 	head.Next = reverseBetween(head.Next, m-1, n-1)
+	return head
+
+}
+
+func reverseIteration(head *ListNode, m, n int) *ListNode {
+	if head == nil || head.Next == nil {
+		return head
+	}
+	var prev *ListNode = nil
+	var cur = head
+	//前进直到需要反转的位置
+	for m > 1 {
+		prev = cur
+		cur = cur.Next
+		m--
+		n--
+	}
+	//tail记录反转链尾，con记录反转前置节点
+	var tail, con, tmp *ListNode = cur, prev, nil
+	//开始反转
+	for n > 0 {
+		tmp = cur.Next
+		cur.Next = prev
+		prev = cur
+		cur = tmp
+		n--
+	}
+	//拼接反转链表prev 到 前置链表con
+	if con != nil {
+		con.Next = prev
+	} else {
+		head = prev
+	}
+	//拼接反转链尾 到 原链表之后
+	tail.Next = cur
 	return head
 
 }
