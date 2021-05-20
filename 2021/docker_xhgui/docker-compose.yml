@@ -1,0 +1,35 @@
+version: "3"
+services:
+  nginx:
+    container_name: nginx
+    image: nginx:1.15.5-alpine
+    ports:
+      - 7002:80
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d/:/etc/nginx/conf.d
+      - ./xhgui/xhgui-web:/home/xhgui-branch
+    depends_on:
+      - xhgui
+  mongo:
+    build: mongo
+    container_name: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongo/data:/data/db
+  xhgui:  
+    build: xhgui
+    container_name: xhgui
+    links:
+      - mongo
+    volumes:
+      - ./xhgui/www.conf:/usr/local/etc/php-fpm.d/www.conf
+      - ./xhgui/php.ini:/usr/local/etc/php/php.ini
+      - ./xhgui/xhgui-web:/home/xhgui-branch
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 7001:8081

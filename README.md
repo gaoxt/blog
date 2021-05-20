@@ -1,5 +1,5 @@
 # description
-个人练习项目存档
+项目存档
 
 # githook
 README.md 目录树生成使用方式
