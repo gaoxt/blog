@@ -9,5 +9,7 @@ FROM mongo:4.0.21
 # db.results.ensureIndex( { 'meta.url' : 1 } )
 # db.results.ensureIndex( { 'meta.simple_url' : 1 } )
 # db.results.ensureIndex( { "meta.request_ts" : 1 }, { expireAfterSeconds : 3600*24*7 } )  7天数据过期
+# db.results.ensureIndex( { 'meta.userId' : 1 } )
+# db.results.getIndexes()
 # use tideways_xhprof
 # db.dropDatabase();
