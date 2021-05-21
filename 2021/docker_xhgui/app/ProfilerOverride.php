@@ -371,6 +371,7 @@ class ProfilerOverride extends Profiler
             "SERVER_PATH"=>SERVER_PATH,
             "ROOT_PATH"=>ROOT_PATH,
             "GAME_PATH"=>GAME_PATH,
+            "REQUEST_TIME"=>time(),
         );
         if(isset($data['meta'])){
             $data['meta']['get'] = array($this->userId,$this->messageId);
