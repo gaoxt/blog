@@ -10,6 +10,9 @@ chmod +x .git/hooks/pre-commit
 git commit 之前会检查当前目录的所有 README.md 生成 directory 树。
 
 # directory
+ * 2021
+	 * [基于Swoole的 PHP性能分析平台 docker搭建](2021/docker_xhgui)
+	 * [swoole项目开发环境搭建](2021/docker_swoole_env)
  * 2020
 	 * [浙图入馆预约脚本](2020/zjlib)
 	 * [LeetCode-by-Golang](2020/leetcode-golang)
