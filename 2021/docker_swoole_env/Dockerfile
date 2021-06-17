@@ -8,6 +8,7 @@ nginx redis-server
 # dpkg -l | grep tzdata
 ENV TZ="Asia/Shanghai"
 RUN echo "set mouse-=a" >> ~/.vimrc 
+RUN echo 'alias tailf="tail -f"' >> ~/.bashrc
 RUN mkdir -p /data/log/
 
 
